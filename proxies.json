@@ -1,0 +1,12 @@
+{
+    "$schema": "http://json.schemastore.org/proxies",
+    "proxies": {
+        "proxy1": {
+            "matchCondition": {
+                "methods": [ "GET" ],
+                "route": "/files/{*pathToFile}"
+            },
+            "backendUri": "http://localhost/api/files?path={pathToFile}"
+        }
+    }
+}

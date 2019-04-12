@@ -1,0 +1,12 @@
+deployment:
+  resources:
+  - type: storageaccount
+    containers:
+    - files
+  - type: appRegistration
+    functionapp: default
+  - type: functionapp
+    deploy: true
+    appRegistration: default
+    settings:
+    - "STORAGE_CONNECTION_STRING=$DEFAULT_STORAGE_ACCOUNT_CONNECTION_STRING"
