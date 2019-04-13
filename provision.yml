@@ -5,6 +5,7 @@ deployment:
     - files
   - type: appRegistration
     functionapp: default
+    availableToOtherTenants: true
   - type: functionapp
     deploy: true
     appRegistration: default

@@ -62,7 +62,7 @@ echo "[{
         'type': 'Scope'
         } ]
     }]" > app-registration-manifest.tmp.json
-DEFAULT_APPLICATION_ID=`az ad app create --identifier-uris $DEFAULT_APPLICATION_IDENTIFIER_URI --available-to-other-tenants false --reply-urls $DEFAULT_FUNCTIONAPP_HOSTNAME/.auth/login/aad/callback --display-name DEFAULT_APPLICATION_IDENTIFIER_URI --password "$DEFAULT_APPLICATION_PASSWORD" --required-resource-access app-registration-manifest.tmp.json --query "appId" -o tsv`
+DEFAULT_APPLICATION_ID=`az ad app create --identifier-uris $DEFAULT_APPLICATION_IDENTIFIER_URI --available-to-other-tenants true --reply-urls $DEFAULT_FUNCTIONAPP_HOSTNAME/.auth/login/aad/callback --display-name DEFAULT_APPLICATION_IDENTIFIER_URI --password "$DEFAULT_APPLICATION_PASSWORD" --required-resource-access app-registration-manifest.tmp.json --query "appId" -o tsv`
 echo "Creating resource group $DEFAULT_RESOURCE_GROUP"
 az group create --name $DEFAULT_RESOURCE_GROUP --location $LOCATION --query "properties.provisioningState" -o tsv
 echo "Creating storage account $DEFAULT_STORAGE_ACCOUNT"
@@ -76,7 +76,8 @@ echo "Creating functionapp $DEFAULT_FUNCTIONAPP"
 az functionapp create -g $DEFAULT_RESOURCE_GROUP --consumption-plan-location $LOCATION --name $DEFAULT_FUNCTIONAPP --storage-account $DEFAULT_STORAGE_ACCOUNT --query "state" -o tsv
 az functionapp config appsettings set --name $DEFAULT_FUNCTIONAPP -g $DEFAULT_RESOURCE_GROUP --settings STORAGE_CONNECTION_STRING=$DEFAULT_STORAGE_ACCOUNT_CONNECTION_STRING > /dev/null
 echo "Configuring easy auth for functionapp $DEFAULT_FUNCTIONAPP"
-az webapp auth update --ids $DEFAULT_RESOURCE_GROUP_RESOURCE_ID/providers/Microsoft.Web/sites/$DEFAULT_FUNCTIONAPP --action LoginWithAzureActiveDirectory --enabled true --aad-client-id $DEFAULT_APPLICATION_ID --aad-client-secret "$DEFAULT_APPLICATION_PASSWORD" --aad-token-issuer-url https://login.microsoftonline.com/$TENANTID/  > /dev/nullecho "Deploying function app $DEFAULT_FUNCTIONAPP"
+az webapp auth update --ids $DEFAULT_RESOURCE_GROUP_RESOURCE_ID/providers/Microsoft.Web/sites/$DEFAULT_FUNCTIONAPP --action LoginWithAzureActiveDirectory --enabled true --aad-client-id $DEFAULT_APPLICATION_ID --aad-client-secret "$DEFAULT_APPLICATION_PASSWORD" --aad-token-issuer-url https://login.microsoftonline.com/$TENANTID/  > /dev/null
+echo "Deploying function app $DEFAULT_FUNCTIONAPP"
 func azure functionapp publish $DEFAULT_FUNCTIONAPP
 
 

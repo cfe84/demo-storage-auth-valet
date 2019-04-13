@@ -6,12 +6,31 @@ So if the file is stored here: `https://demo123.blob.core.windows.net/files/happ
 
 ![](valet.jpg)
 
+1.	Client is asking for a file using a structure replicating that of the storage account. 
+2.	Valet is checking context to see if the customer is authenticated. If not, then the client is redirected to the IdP
+3.	Client is redirected to IdP, and potentially has to authenticate 
+4.	Client is redirected to the original URL again
+5.	Valet is checking context again and validating authorization. This time the user is allowed in, and so it generates a short-lived Shared Access Signature and redirect to the blob’s url (containing the SAS)
+6.	Client is redirected to the blob and sees it.
+
+This seems a lot but keep in mind that:
+
+-	If the user has already used the system before, and are currently in a session, then step 2 to 4 might not happen, or they might happen but might not have to re-authenticate and the redirection could be invisible to them (in my experience, sub-second) ; so it’s actually almost a transparent experience for the user.
+-	EasyAuth (provided you use Azure Functions or WebApps for that system) is taking care of most of steps 2 to 4, as long as you use an OIDC IdP (so, even if you don’t use Azure AD) ; so it’s a fairly straight forward thing to implement.
+
+
 # Alternative
 
 An alternative is to use [AAD-backed RBAC for blobs](https://docs.microsoft.com/en-us/azure/storage/common/storage-auth-aad?toc=%2fazure%2fstorage%2fblobs%2ftoc.json#rbac-roles-for-blobs-and-queues). This is an easier solution but it has limitations:
 
 - Permissions are set at a container level. If you need finer grained authorization, then a valet will give you that flexibility
 - If you are not using AAD, then this pattern allows you to handle authorization the way you need to. Since Easy-Auth is using OIDC, any OIDC provider can actually be configured.
+
+# How does this demo work?
+
+This demo is an Azure Function. It uses the following artifacts:
+- A function, in `files.cs`, with an HTTP trigger, that receives the input request, a Blob binding that we use to generate the SAS, and then it redirects the client.
+- A function proxy, in `proxies.json`, which redirects anything sent to `http://xxx/files/WHATEVER_YOU_PUT/HERE` to the function.
 
 # To deploy the demo
 
