@@ -4,6 +4,8 @@ Then this pattern consists in putting a valet in front of the storage account, h
 
 So if the file is stored here: `https://demo123.blob.core.windows.net/files/happy.jpg`, then the URL provided to the users will be `https://functionapp123.azurewebsites.net/files/happy.jpg`. When directed there, the function will authorize the call then generate a SAS and redirect to the url (e.g. `https://demo123.blob.core.windows.net/files/happy.jpg?sv=2018-03-28&sr=b&sig=VEpGsNghVV8QEyq18z%2F8R6rW7RuY8kta1sAdHMnq8PM%3D&st=2019-04-12T23%3A13%3A08Z&se=2019-04-12T23%3A33%3A08Z&sp=r`).
 
+![](valet.jpg)
+
 # Alternative
 
 An alternative is to use [AAD-backed RBAC for blobs](https://docs.microsoft.com/en-us/azure/storage/common/storage-auth-aad?toc=%2fazure%2fstorage%2fblobs%2ftoc.json#rbac-roles-for-blobs-and-queues). This is an easier solution but it has limitations:
